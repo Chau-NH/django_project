@@ -56,27 +56,43 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:/code
+      - .:/app
     ports:
       - 8000:8000
     depends_on:
       - db
-  db:
-    container_name: postgres-db
-    image: postgres:14
+  db: 
+    container_name: mysql-db
+    image: mysql:8.0.34
+    restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - ./.env.dev
     environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
-
+      MYSQL_ROOT_PASSWORD: ${SQL_ROOT_PASSWORD}
+      MYSQL_USER: ${SQL_USER}
+      MYSQL_PASSWORD: ${SQL_PASSWORD}
+      MYSQL_DATABASE: ${SQL_DATABASE}
+    ports:
+      - 3306:3306
 volumes:
-  postgres_data:
+  mysql_data:
 
 ```
+6. Run docker compose
+```sh
+docker compose --env-file .env.dev up --build -d
+```
 
-6. Run migration script
+7. Run migration script
 ```sh
 python3 manage.py migrate
 ```
+
+8. Create super user
+```sh
+docker exec -it django-web python3 manage.py createsuperuser
+```
+
+9. Visit `http://localhost:8000` or `http://localhost:8000/admin`

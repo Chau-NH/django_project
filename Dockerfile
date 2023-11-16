@@ -6,8 +6,12 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1 
 ENV PYTHONUNBUFFERED 1
 
-# Set environment variables
-WORKDIR /code
+# Install mysql extensions
+RUN apt-get update
+RUN apt-get install gcc default-libmysqlclient-dev -y
+
+# Set working directory
+WORKDIR /app
 
 # Install dependencies
 COPY ./requirements.txt .
